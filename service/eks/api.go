@@ -5787,6 +5787,10 @@ func (c *EKS) UpdateClusterConfigRequest(input *UpdateClusterConfigInput) (req *
 // (https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html) in the
 // Amazon EKS User Guide .
 //
+// You can also use this API operation to enable or disable ARC zonal shift.
+// If zonal shift is enabled, Amazon Web Services configures zonal autoshift
+// for the cluster.
+//
 // Cluster updates are asynchronous, and they should finish within a few minutes.
 // During an update, the cluster status moves to UPDATING (this status transition
 // is eventually consistent). When the update is complete (either Failed or
@@ -7160,6 +7164,9 @@ type AddonVersionInfo struct {
 	// An object representing the compatibilities of a version.
 	Compatibilities []*Compatibility `locationName:"compatibilities" type:"list"`
 
+	// Indicates the compute type of the addon version.
+	ComputeTypes []*string `locationName:"computeTypes" type:"list"`
+
 	// Whether the add-on requires configuration.
 	RequiresConfiguration *bool `locationName:"requiresConfiguration" type:"boolean"`
 
@@ -7201,6 +7208,12 @@ func (s *AddonVersionInfo) SetArchitecture(v []*string) *AddonVersionInfo {
 // SetCompatibilities sets the Compatibilities field's value.
 func (s *AddonVersionInfo) SetCompatibilities(v []*Compatibility) *AddonVersionInfo {
 	s.Compatibilities = v
+	return s
+}
+
+// SetComputeTypes sets the ComputeTypes field's value.
+func (s *AddonVersionInfo) SetComputeTypes(v []*string) *AddonVersionInfo {
+	s.ComputeTypes = v
 	return s
 }
 
@@ -7758,6 +7771,44 @@ func (s *BadRequestException) RequestID() string {
 	return s.RespMetadata.RequestID
 }
 
+// Indicates the current configuration of the block storage capability on your
+// EKS Auto Mode cluster. For example, if the capability is enabled or disabled.
+// If the block storage capability is enabled, EKS Auto Mode will create and
+// delete EBS volumes in your Amazon Web Services account. For more information,
+// see EKS Auto Mode block storage capability in the EKS User Guide.
+type BlockStorage struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates if the block storage capability is enabled on your EKS Auto Mode
+	// cluster. If the block storage capability is enabled, EKS Auto Mode will create
+	// and delete EBS volumes in your Amazon Web Services account.
+	Enabled *bool `locationName:"enabled" type:"boolean"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s BlockStorage) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s BlockStorage) GoString() string {
+	return s.String()
+}
+
+// SetEnabled sets the Enabled field's value.
+func (s *BlockStorage) SetEnabled(v bool) *BlockStorage {
+	s.Enabled = &v
+	return s
+}
+
 // An object representing the certificate-authority-data for your cluster.
 type Certificate struct {
 	_ struct{} `type:"structure"`
@@ -7942,6 +7993,13 @@ type Cluster struct {
 	// of the request.
 	ClientRequestToken *string `locationName:"clientRequestToken" type:"string"`
 
+	// Indicates the current configuration of the compute capability on your EKS
+	// Auto Mode cluster. For example, if the capability is enabled or disabled.
+	// If the compute capability is enabled, EKS Auto Mode will create and delete
+	// EC2 Managed Instances in your Amazon Web Services account. For more information,
+	// see EKS Auto Mode compute capability in the EKS User Guide.
+	ComputeConfig *ComputeConfigResponse `locationName:"computeConfig" type:"structure"`
+
 	// The configuration used to connect to a cluster for registration.
 	ConnectorConfig *ConnectorConfigResponse `locationName:"connectorConfig" type:"structure"`
 
@@ -7987,6 +8045,10 @@ type Cluster struct {
 	// in the Amazon EKS User Guide .
 	PlatformVersion *string `locationName:"platformVersion" type:"string"`
 
+	// The configuration in the cluster for EKS Hybrid Nodes. You can't change or
+	// update this configuration after the cluster is created.
+	RemoteNetworkConfig *RemoteNetworkConfigResponse `locationName:"remoteNetworkConfig" type:"structure"`
+
 	// The VPC configuration used by the cluster control plane. Amazon EKS VPC resources
 	// have specific requirements to work properly with Kubernetes. For more information,
 	// see Cluster VPC considerations (https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html)
@@ -8002,6 +8064,13 @@ type Cluster struct {
 	// The current status of the cluster.
 	Status *string `locationName:"status" type:"string" enum:"ClusterStatus"`
 
+	// Indicates the current configuration of the block storage capability on your
+	// EKS Auto Mode cluster. For example, if the capability is enabled or disabled.
+	// If the block storage capability is enabled, EKS Auto Mode will create and
+	// delete EBS volumes in your Amazon Web Services account. For more information,
+	// see EKS Auto Mode block storage capability in the EKS User Guide.
+	StorageConfig *StorageConfigResponse `locationName:"storageConfig" type:"structure"`
+
 	// Metadata that assists with categorization and organization. Each tag consists
 	// of a key and an optional value. You define both. Tags don't propagate to
 	// any other cluster or Amazon Web Services resources.
@@ -8014,6 +8083,9 @@ type Cluster struct {
 
 	// The Kubernetes server version for the cluster.
 	Version *string `locationName:"version" type:"string"`
+
+	// The configuration for zonal shift for the cluster.
+	ZonalShiftConfig *ZonalShiftConfigResponse `locationName:"zonalShiftConfig" type:"structure"`
 }
 
 // String returns the string representation.
@@ -8055,6 +8127,12 @@ func (s *Cluster) SetCertificateAuthority(v *Certificate) *Cluster {
 // SetClientRequestToken sets the ClientRequestToken field's value.
 func (s *Cluster) SetClientRequestToken(v string) *Cluster {
 	s.ClientRequestToken = &v
+	return s
+}
+
+// SetComputeConfig sets the ComputeConfig field's value.
+func (s *Cluster) SetComputeConfig(v *ComputeConfigResponse) *Cluster {
+	s.ComputeConfig = v
 	return s
 }
 
@@ -8130,6 +8208,12 @@ func (s *Cluster) SetPlatformVersion(v string) *Cluster {
 	return s
 }
 
+// SetRemoteNetworkConfig sets the RemoteNetworkConfig field's value.
+func (s *Cluster) SetRemoteNetworkConfig(v *RemoteNetworkConfigResponse) *Cluster {
+	s.RemoteNetworkConfig = v
+	return s
+}
+
 // SetResourcesVpcConfig sets the ResourcesVpcConfig field's value.
 func (s *Cluster) SetResourcesVpcConfig(v *VpcConfigResponse) *Cluster {
 	s.ResourcesVpcConfig = v
@@ -8148,6 +8232,12 @@ func (s *Cluster) SetStatus(v string) *Cluster {
 	return s
 }
 
+// SetStorageConfig sets the StorageConfig field's value.
+func (s *Cluster) SetStorageConfig(v *StorageConfigResponse) *Cluster {
+	s.StorageConfig = v
+	return s
+}
+
 // SetTags sets the Tags field's value.
 func (s *Cluster) SetTags(v map[string]*string) *Cluster {
 	s.Tags = v
@@ -8163,6 +8253,12 @@ func (s *Cluster) SetUpgradePolicy(v *UpgradePolicyResponse) *Cluster {
 // SetVersion sets the Version field's value.
 func (s *Cluster) SetVersion(v string) *Cluster {
 	s.Version = &v
+	return s
+}
+
+// SetZonalShiftConfig sets the ZonalShiftConfig field's value.
+func (s *Cluster) SetZonalShiftConfig(v *ZonalShiftConfigResponse) *Cluster {
+	s.ZonalShiftConfig = v
 	return s
 }
 
@@ -8295,6 +8391,120 @@ func (s *Compatibility) SetDefaultVersion(v bool) *Compatibility {
 // SetPlatformVersions sets the PlatformVersions field's value.
 func (s *Compatibility) SetPlatformVersions(v []*string) *Compatibility {
 	s.PlatformVersions = v
+	return s
+}
+
+// Request to update the configuration of the compute capability of your EKS
+// Auto Mode cluster. For example, enable the capability. For more information,
+// see EKS Auto Mode compute capability in the EKS User Guide.
+type ComputeConfigRequest struct {
+	_ struct{} `type:"structure"`
+
+	// Request to enable or disable the compute capability on your EKS Auto Mode
+	// cluster. If the compute capability is enabled, EKS Auto Mode will create
+	// and delete EC2 Managed Instances in your Amazon Web Services account.
+	Enabled *bool `locationName:"enabled" type:"boolean"`
+
+	// Configuration for node pools that defines the compute resources for your
+	// EKS Auto Mode cluster. For more information, see EKS Auto Mode Node Pools
+	// in the EKS User Guide.
+	NodePools []*string `locationName:"nodePools" type:"list"`
+
+	// The ARN of the IAM Role EKS will assign to EC2 Managed Instances in your
+	// EKS Auto Mode cluster. This value cannot be changed after the compute capability
+	// of EKS Auto Mode is enabled. For more information, see the IAM Reference
+	// in the EKS User Guide.
+	NodeRoleArn *string `locationName:"nodeRoleArn" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ComputeConfigRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ComputeConfigRequest) GoString() string {
+	return s.String()
+}
+
+// SetEnabled sets the Enabled field's value.
+func (s *ComputeConfigRequest) SetEnabled(v bool) *ComputeConfigRequest {
+	s.Enabled = &v
+	return s
+}
+
+// SetNodePools sets the NodePools field's value.
+func (s *ComputeConfigRequest) SetNodePools(v []*string) *ComputeConfigRequest {
+	s.NodePools = v
+	return s
+}
+
+// SetNodeRoleArn sets the NodeRoleArn field's value.
+func (s *ComputeConfigRequest) SetNodeRoleArn(v string) *ComputeConfigRequest {
+	s.NodeRoleArn = &v
+	return s
+}
+
+// Indicates the status of the request to update the compute capability of your
+// EKS Auto Mode cluster.
+type ComputeConfigResponse struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates if the compute capability is enabled on your EKS Auto Mode cluster.
+	// If the compute capability is enabled, EKS Auto Mode will create and delete
+	// EC2 Managed Instances in your Amazon Web Services account.
+	Enabled *bool `locationName:"enabled" type:"boolean"`
+
+	// Indicates the current configuration of node pools in your EKS Auto Mode cluster.
+	// For more information, see EKS Auto Mode Node Pools in the EKS User Guide.
+	NodePools []*string `locationName:"nodePools" type:"list"`
+
+	// The ARN of the IAM Role EKS will assign to EC2 Managed Instances in your
+	// EKS Auto Mode cluster.
+	NodeRoleArn *string `locationName:"nodeRoleArn" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ComputeConfigResponse) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ComputeConfigResponse) GoString() string {
+	return s.String()
+}
+
+// SetEnabled sets the Enabled field's value.
+func (s *ComputeConfigResponse) SetEnabled(v bool) *ComputeConfigResponse {
+	s.Enabled = &v
+	return s
+}
+
+// SetNodePools sets the NodePools field's value.
+func (s *ComputeConfigResponse) SetNodePools(v []*string) *ComputeConfigResponse {
+	s.NodePools = v
+	return s
+}
+
+// SetNodeRoleArn sets the NodeRoleArn field's value.
+func (s *ComputeConfigResponse) SetNodeRoleArn(v string) *ComputeConfigResponse {
+	s.NodeRoleArn = &v
 	return s
 }
 
@@ -8975,6 +9185,12 @@ type CreateClusterInput struct {
 	// of the request.
 	ClientRequestToken *string `locationName:"clientRequestToken" type:"string" idempotencyToken:"true"`
 
+	// Enable or disable the compute capability of EKS Auto Mode when creating your
+	// EKS Auto Mode cluster. If the compute capability is enabled, EKS Auto Mode
+	// will create and delete EC2 Managed Instances in your Amazon Web Services
+	// account
+	ComputeConfig *ComputeConfigRequest `locationName:"computeConfig" type:"structure"`
+
 	// The encryption configuration for the cluster.
 	EncryptionConfig []*EncryptionConfig `locationName:"encryptionConfig" type:"list"`
 
@@ -8992,7 +9208,11 @@ type CreateClusterInput struct {
 	// (http://aws.amazon.com/cloudwatch/pricing/).
 	Logging *Logging `locationName:"logging" type:"structure"`
 
-	// The unique name to give to your cluster.
+	// The unique name to give to your cluster. The name can contain only alphanumeric
+	// characters (case-sensitive), hyphens, and underscores. It must start with
+	// an alphanumeric character and can't be longer than 100 characters. The name
+	// must be unique within the Amazon Web Services Region and Amazon Web Services
+	// account that you're creating the cluster in.
 	//
 	// Name is a required field
 	Name *string `locationName:"name" min:"1" type:"string" required:"true"`
@@ -9004,6 +9224,10 @@ type CreateClusterInput struct {
 	// in the Amazon EKS User Guide. This object isn't available for creating Amazon
 	// EKS clusters on the Amazon Web Services cloud.
 	OutpostConfig *OutpostConfigRequest `locationName:"outpostConfig" type:"structure"`
+
+	// The configuration in the cluster for EKS Hybrid Nodes. You can't change or
+	// update this configuration after the cluster is created.
+	RemoteNetworkConfig *RemoteNetworkConfigRequest `locationName:"remoteNetworkConfig" type:"structure"`
 
 	// The VPC configuration that's used by the cluster control plane. Amazon EKS
 	// VPC resources have specific requirements to work properly with Kubernetes.
@@ -9025,6 +9249,12 @@ type CreateClusterInput struct {
 	// RoleArn is a required field
 	RoleArn *string `locationName:"roleArn" type:"string" required:"true"`
 
+	// Enable or disable the block storage capability of EKS Auto Mode when creating
+	// your EKS Auto Mode cluster. If the block storage capability is enabled, EKS
+	// Auto Mode will create and delete EBS volumes in your Amazon Web Services
+	// account.
+	StorageConfig *StorageConfigRequest `locationName:"storageConfig" type:"structure"`
+
 	// Metadata that assists with categorization and organization. Each tag consists
 	// of a key and an optional value. You define both. Tags don't propagate to
 	// any other cluster or Amazon Web Services resources.
@@ -9039,6 +9269,25 @@ type CreateClusterInput struct {
 	//
 	// The default version might not be the latest version available.
 	Version *string `locationName:"version" type:"string"`
+
+	// Enable or disable ARC zonal shift for the cluster. If zonal shift is enabled,
+	// Amazon Web Services configures zonal autoshift for the cluster.
+	//
+	// Zonal shift is a feature of Amazon Application Recovery Controller (ARC).
+	// ARC zonal shift is designed to be a temporary measure that allows you to
+	// move traffic for a resource away from an impaired AZ until the zonal shift
+	// expires or you cancel it. You can extend the zonal shift if necessary.
+	//
+	// You can start a zonal shift for an EKS cluster, or you can allow Amazon Web
+	// Services to do it for you by enabling zonal autoshift. This shift updates
+	// the flow of east-to-west network traffic in your cluster to only consider
+	// network endpoints for Pods running on worker nodes in healthy AZs. Additionally,
+	// any ALB or NLB handling ingress traffic for applications in your EKS cluster
+	// will automatically route traffic to targets in the healthy AZs. For more
+	// information about zonal shift in EKS, see Learn about Amazon Application
+	// Recovery Controller (ARC) Zonal Shift in Amazon EKS (https://docs.aws.amazon.com/eks/latest/userguide/zone-shift.html)
+	// in the Amazon EKS User Guide .
+	ZonalShiftConfig *ZonalShiftConfigRequest `locationName:"zonalShiftConfig" type:"structure"`
 }
 
 // String returns the string representation.
@@ -9107,6 +9356,12 @@ func (s *CreateClusterInput) SetClientRequestToken(v string) *CreateClusterInput
 	return s
 }
 
+// SetComputeConfig sets the ComputeConfig field's value.
+func (s *CreateClusterInput) SetComputeConfig(v *ComputeConfigRequest) *CreateClusterInput {
+	s.ComputeConfig = v
+	return s
+}
+
 // SetEncryptionConfig sets the EncryptionConfig field's value.
 func (s *CreateClusterInput) SetEncryptionConfig(v []*EncryptionConfig) *CreateClusterInput {
 	s.EncryptionConfig = v
@@ -9137,6 +9392,12 @@ func (s *CreateClusterInput) SetOutpostConfig(v *OutpostConfigRequest) *CreateCl
 	return s
 }
 
+// SetRemoteNetworkConfig sets the RemoteNetworkConfig field's value.
+func (s *CreateClusterInput) SetRemoteNetworkConfig(v *RemoteNetworkConfigRequest) *CreateClusterInput {
+	s.RemoteNetworkConfig = v
+	return s
+}
+
 // SetResourcesVpcConfig sets the ResourcesVpcConfig field's value.
 func (s *CreateClusterInput) SetResourcesVpcConfig(v *VpcConfigRequest) *CreateClusterInput {
 	s.ResourcesVpcConfig = v
@@ -9146,6 +9407,12 @@ func (s *CreateClusterInput) SetResourcesVpcConfig(v *VpcConfigRequest) *CreateC
 // SetRoleArn sets the RoleArn field's value.
 func (s *CreateClusterInput) SetRoleArn(v string) *CreateClusterInput {
 	s.RoleArn = &v
+	return s
+}
+
+// SetStorageConfig sets the StorageConfig field's value.
+func (s *CreateClusterInput) SetStorageConfig(v *StorageConfigRequest) *CreateClusterInput {
+	s.StorageConfig = v
 	return s
 }
 
@@ -9164,6 +9431,12 @@ func (s *CreateClusterInput) SetUpgradePolicy(v *UpgradePolicyRequest) *CreateCl
 // SetVersion sets the Version field's value.
 func (s *CreateClusterInput) SetVersion(v string) *CreateClusterInput {
 	s.Version = &v
+	return s
+}
+
+// SetZonalShiftConfig sets the ZonalShiftConfig field's value.
+func (s *CreateClusterInput) SetZonalShiftConfig(v *ZonalShiftConfigRequest) *CreateClusterInput {
+	s.ZonalShiftConfig = v
 	return s
 }
 
@@ -12479,6 +12752,43 @@ func (s *EksAnywhereSubscriptionTerm) SetUnit(v string) *EksAnywhereSubscription
 	return s
 }
 
+// Indicates the current configuration of the load balancing capability on your
+// EKS Auto Mode cluster. For example, if the capability is enabled or disabled.
+// For more information, see EKS Auto Mode load balancing capability in the
+// EKS User Guide.
+type ElasticLoadBalancing struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates if the load balancing capability is enabled on your EKS Auto Mode
+	// cluster. If the load balancing capability is enabled, EKS Auto Mode will
+	// create and delete load balancers in your Amazon Web Services account.
+	Enabled *bool `locationName:"enabled" type:"boolean"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ElasticLoadBalancing) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ElasticLoadBalancing) GoString() string {
+	return s.String()
+}
+
+// SetEnabled sets the Enabled field's value.
+func (s *ElasticLoadBalancing) SetEnabled(v bool) *ElasticLoadBalancing {
+	s.Enabled = &v
+	return s
+}
+
 // The encryption configuration for the cluster.
 type EncryptionConfig struct {
 	_ struct{} `type:"structure"`
@@ -13551,6 +13861,11 @@ type Issue struct {
 	//    can happen if there are network disruptions or if API servers are timing
 	//    out processing requests.
 	//
+	//    * Ec2InstanceTypeDoesNotExist: One or more of the supplied Amazon EC2
+	//    instance types do not exist. Amazon EKS checked for the instance types
+	//    that you provided in this Amazon Web Services Region, and one or more
+	//    aren't available.
+	//
 	//    * Ec2LaunchTemplateNotFound: We couldn't find the Amazon EC2 launch template
 	//    for your managed node group. You may be able to recreate a launch template
 	//    with the same settings to recover.
@@ -13647,6 +13962,11 @@ func (s *Issue) SetResourceIds(v []*string) *Issue {
 type KubernetesNetworkConfigRequest struct {
 	_ struct{} `type:"structure"`
 
+	// Request to enable or disable the load balancing capability on your EKS Auto
+	// Mode cluster. For more information, see EKS Auto Mode load balancing capability
+	// in the EKS User Guide.
+	ElasticLoadBalancing *ElasticLoadBalancing `locationName:"elasticLoadBalancing" type:"structure"`
+
 	// Specify which IP family is used to assign Kubernetes pod and service IP addresses.
 	// If you don't specify a value, ipv4 is used by default. You can only specify
 	// an IP family when you create a cluster and can't change this value once the
@@ -13701,6 +14021,12 @@ func (s KubernetesNetworkConfigRequest) GoString() string {
 	return s.String()
 }
 
+// SetElasticLoadBalancing sets the ElasticLoadBalancing field's value.
+func (s *KubernetesNetworkConfigRequest) SetElasticLoadBalancing(v *ElasticLoadBalancing) *KubernetesNetworkConfigRequest {
+	s.ElasticLoadBalancing = v
+	return s
+}
+
 // SetIpFamily sets the IpFamily field's value.
 func (s *KubernetesNetworkConfigRequest) SetIpFamily(v string) *KubernetesNetworkConfigRequest {
 	s.IpFamily = &v
@@ -13717,6 +14043,10 @@ func (s *KubernetesNetworkConfigRequest) SetServiceIpv4Cidr(v string) *Kubernete
 // a value for serviceIpv6Cidr or serviceIpv4Cidr, but not both.
 type KubernetesNetworkConfigResponse struct {
 	_ struct{} `type:"structure"`
+
+	// Indicates the current configuration of the load balancing capability on your
+	// EKS Auto Mode cluster. For example, if the capability is enabled or disabled.
+	ElasticLoadBalancing *ElasticLoadBalancing `locationName:"elasticLoadBalancing" type:"structure"`
 
 	// The IP family used to assign Kubernetes Pod and Service objects IP addresses.
 	// The IP family is always ipv4, unless you have a 1.21 or later cluster running
@@ -13757,6 +14087,12 @@ func (s KubernetesNetworkConfigResponse) String() string {
 // value will be replaced with "sensitive".
 func (s KubernetesNetworkConfigResponse) GoString() string {
 	return s.String()
+}
+
+// SetElasticLoadBalancing sets the ElasticLoadBalancing field's value.
+func (s *KubernetesNetworkConfigResponse) SetElasticLoadBalancing(v *ElasticLoadBalancing) *KubernetesNetworkConfigResponse {
+	s.ElasticLoadBalancing = v
+	return s
 }
 
 // SetIpFamily sets the IpFamily field's value.
@@ -17109,6 +17445,158 @@ func (s *RemoteAccessConfig) SetSourceSecurityGroups(v []*string) *RemoteAccessC
 	return s
 }
 
+// The configuration in the cluster for EKS Hybrid Nodes. You can't change or
+// update this configuration after the cluster is created.
+type RemoteNetworkConfigRequest struct {
+	_ struct{} `type:"structure"`
+
+	// The list of network CIDRs that can contain hybrid nodes.
+	RemoteNodeNetworks []*RemoteNodeNetwork `locationName:"remoteNodeNetworks" type:"list"`
+
+	// The list of network CIDRs that can contain pods that run Kubernetes webhooks
+	// on hybrid nodes.
+	RemotePodNetworks []*RemotePodNetwork `locationName:"remotePodNetworks" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemoteNetworkConfigRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemoteNetworkConfigRequest) GoString() string {
+	return s.String()
+}
+
+// SetRemoteNodeNetworks sets the RemoteNodeNetworks field's value.
+func (s *RemoteNetworkConfigRequest) SetRemoteNodeNetworks(v []*RemoteNodeNetwork) *RemoteNetworkConfigRequest {
+	s.RemoteNodeNetworks = v
+	return s
+}
+
+// SetRemotePodNetworks sets the RemotePodNetworks field's value.
+func (s *RemoteNetworkConfigRequest) SetRemotePodNetworks(v []*RemotePodNetwork) *RemoteNetworkConfigRequest {
+	s.RemotePodNetworks = v
+	return s
+}
+
+// The configuration in the cluster for EKS Hybrid Nodes. You can't change or
+// update this configuration after the cluster is created.
+type RemoteNetworkConfigResponse struct {
+	_ struct{} `type:"structure"`
+
+	// The list of network CIDRs that can contain hybrid nodes.
+	RemoteNodeNetworks []*RemoteNodeNetwork `locationName:"remoteNodeNetworks" type:"list"`
+
+	// The list of network CIDRs that can contain pods that run Kubernetes webhooks
+	// on hybrid nodes.
+	RemotePodNetworks []*RemotePodNetwork `locationName:"remotePodNetworks" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemoteNetworkConfigResponse) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemoteNetworkConfigResponse) GoString() string {
+	return s.String()
+}
+
+// SetRemoteNodeNetworks sets the RemoteNodeNetworks field's value.
+func (s *RemoteNetworkConfigResponse) SetRemoteNodeNetworks(v []*RemoteNodeNetwork) *RemoteNetworkConfigResponse {
+	s.RemoteNodeNetworks = v
+	return s
+}
+
+// SetRemotePodNetworks sets the RemotePodNetworks field's value.
+func (s *RemoteNetworkConfigResponse) SetRemotePodNetworks(v []*RemotePodNetwork) *RemoteNetworkConfigResponse {
+	s.RemotePodNetworks = v
+	return s
+}
+
+// A network CIDR that can contain hybrid nodes.
+type RemoteNodeNetwork struct {
+	_ struct{} `type:"structure"`
+
+	// A network CIDR that can contain hybrid nodes.
+	Cidrs []*string `locationName:"cidrs" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemoteNodeNetwork) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemoteNodeNetwork) GoString() string {
+	return s.String()
+}
+
+// SetCidrs sets the Cidrs field's value.
+func (s *RemoteNodeNetwork) SetCidrs(v []*string) *RemoteNodeNetwork {
+	s.Cidrs = v
+	return s
+}
+
+// A network CIDR that can contain pods that run Kubernetes webhooks on hybrid
+// nodes.
+type RemotePodNetwork struct {
+	_ struct{} `type:"structure"`
+
+	// A network CIDR that can contain pods that run Kubernetes webhooks on hybrid
+	// nodes.
+	Cidrs []*string `locationName:"cidrs" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemotePodNetwork) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RemotePodNetwork) GoString() string {
+	return s.String()
+}
+
+// SetCidrs sets the Cidrs field's value.
+func (s *RemotePodNetwork) SetCidrs(v []*string) *RemotePodNetwork {
+	s.Cidrs = v
+	return s
+}
+
 // The specified resource is in use.
 type ResourceInUseException struct {
 	_            struct{}                  `type:"structure"`
@@ -17546,6 +18034,74 @@ func (s *ServiceUnavailableException) StatusCode() int {
 // RequestID returns the service's response RequestID for request.
 func (s *ServiceUnavailableException) RequestID() string {
 	return s.RespMetadata.RequestID
+}
+
+// Request to update the configuration of the storage capability of your EKS
+// Auto Mode cluster. For example, enable the capability. For more information,
+// see EKS Auto Mode block storage capability in the EKS User Guide.
+type StorageConfigRequest struct {
+	_ struct{} `type:"structure"`
+
+	// Request to configure EBS Block Storage settings for your EKS Auto Mode cluster.
+	BlockStorage *BlockStorage `locationName:"blockStorage" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s StorageConfigRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s StorageConfigRequest) GoString() string {
+	return s.String()
+}
+
+// SetBlockStorage sets the BlockStorage field's value.
+func (s *StorageConfigRequest) SetBlockStorage(v *BlockStorage) *StorageConfigRequest {
+	s.BlockStorage = v
+	return s
+}
+
+// Indicates the status of the request to update the block storage capability
+// of your EKS Auto Mode cluster.
+type StorageConfigResponse struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates the current configuration of the block storage capability on your
+	// EKS Auto Mode cluster. For example, if the capability is enabled or disabled.
+	BlockStorage *BlockStorage `locationName:"blockStorage" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s StorageConfigResponse) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s StorageConfigResponse) GoString() string {
+	return s.String()
+}
+
+// SetBlockStorage sets the BlockStorage field's value.
+func (s *StorageConfigResponse) SetBlockStorage(v *BlockStorage) *StorageConfigResponse {
+	s.BlockStorage = v
+	return s
 }
 
 type TagResourceInput struct {
@@ -18332,6 +18888,13 @@ type UpdateClusterConfigInput struct {
 	// of the request.
 	ClientRequestToken *string `locationName:"clientRequestToken" type:"string" idempotencyToken:"true"`
 
+	// Update the configuration of the compute capability of your EKS Auto Mode
+	// cluster. For example, enable the capability.
+	ComputeConfig *ComputeConfigRequest `locationName:"computeConfig" type:"structure"`
+
+	// The Kubernetes network configuration for the cluster.
+	KubernetesNetworkConfig *KubernetesNetworkConfigRequest `locationName:"kubernetesNetworkConfig" type:"structure"`
+
 	// Enable or disable exporting the Kubernetes control plane logs for your cluster
 	// to CloudWatch Logs. By default, cluster control plane logs aren't exported
 	// to CloudWatch Logs. For more information, see Amazon EKS cluster control
@@ -18351,10 +18914,33 @@ type UpdateClusterConfigInput struct {
 	// An object representing the VPC configuration to use for an Amazon EKS cluster.
 	ResourcesVpcConfig *VpcConfigRequest `locationName:"resourcesVpcConfig" type:"structure"`
 
+	// Update the configuration of the block storage capability of your EKS Auto
+	// Mode cluster. For example, enable the capability.
+	StorageConfig *StorageConfigRequest `locationName:"storageConfig" type:"structure"`
+
 	// You can enable or disable extended support for clusters currently on standard
 	// support. You cannot disable extended support once it starts. You must enable
 	// extended support before your cluster exits standard support.
 	UpgradePolicy *UpgradePolicyRequest `locationName:"upgradePolicy" type:"structure"`
+
+	// Enable or disable ARC zonal shift for the cluster. If zonal shift is enabled,
+	// Amazon Web Services configures zonal autoshift for the cluster.
+	//
+	// Zonal shift is a feature of Amazon Application Recovery Controller (ARC).
+	// ARC zonal shift is designed to be a temporary measure that allows you to
+	// move traffic for a resource away from an impaired AZ until the zonal shift
+	// expires or you cancel it. You can extend the zonal shift if necessary.
+	//
+	// You can start a zonal shift for an EKS cluster, or you can allow Amazon Web
+	// Services to do it for you by enabling zonal autoshift. This shift updates
+	// the flow of east-to-west network traffic in your cluster to only consider
+	// network endpoints for Pods running on worker nodes in healthy AZs. Additionally,
+	// any ALB or NLB handling ingress traffic for applications in your EKS cluster
+	// will automatically route traffic to targets in the healthy AZs. For more
+	// information about zonal shift in EKS, see Learn about Amazon Application
+	// Recovery Controller (ARC) Zonal Shift in Amazon EKS (https://docs.aws.amazon.com/eks/latest/userguide/zone-shift.html)
+	// in the Amazon EKS User Guide .
+	ZonalShiftConfig *ZonalShiftConfigRequest `locationName:"zonalShiftConfig" type:"structure"`
 }
 
 // String returns the string representation.
@@ -18403,6 +18989,18 @@ func (s *UpdateClusterConfigInput) SetClientRequestToken(v string) *UpdateCluste
 	return s
 }
 
+// SetComputeConfig sets the ComputeConfig field's value.
+func (s *UpdateClusterConfigInput) SetComputeConfig(v *ComputeConfigRequest) *UpdateClusterConfigInput {
+	s.ComputeConfig = v
+	return s
+}
+
+// SetKubernetesNetworkConfig sets the KubernetesNetworkConfig field's value.
+func (s *UpdateClusterConfigInput) SetKubernetesNetworkConfig(v *KubernetesNetworkConfigRequest) *UpdateClusterConfigInput {
+	s.KubernetesNetworkConfig = v
+	return s
+}
+
 // SetLogging sets the Logging field's value.
 func (s *UpdateClusterConfigInput) SetLogging(v *Logging) *UpdateClusterConfigInput {
 	s.Logging = v
@@ -18421,9 +19019,21 @@ func (s *UpdateClusterConfigInput) SetResourcesVpcConfig(v *VpcConfigRequest) *U
 	return s
 }
 
+// SetStorageConfig sets the StorageConfig field's value.
+func (s *UpdateClusterConfigInput) SetStorageConfig(v *StorageConfigRequest) *UpdateClusterConfigInput {
+	s.StorageConfig = v
+	return s
+}
+
 // SetUpgradePolicy sets the UpgradePolicy field's value.
 func (s *UpdateClusterConfigInput) SetUpgradePolicy(v *UpgradePolicyRequest) *UpdateClusterConfigInput {
 	s.UpgradePolicy = v
+	return s
+}
+
+// SetZonalShiftConfig sets the ZonalShiftConfig field's value.
+func (s *UpdateClusterConfigInput) SetZonalShiftConfig(v *ZonalShiftConfigRequest) *UpdateClusterConfigInput {
+	s.ZonalShiftConfig = v
 	return s
 }
 
@@ -19539,6 +20149,71 @@ func (s *VpcConfigResponse) SetVpcId(v string) *VpcConfigResponse {
 	return s
 }
 
+// The configuration for zonal shift for the cluster.
+type ZonalShiftConfigRequest struct {
+	_ struct{} `type:"structure"`
+
+	// If zonal shift is enabled, Amazon Web Services configures zonal autoshift
+	// for the cluster.
+	Enabled *bool `locationName:"enabled" type:"boolean"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ZonalShiftConfigRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ZonalShiftConfigRequest) GoString() string {
+	return s.String()
+}
+
+// SetEnabled sets the Enabled field's value.
+func (s *ZonalShiftConfigRequest) SetEnabled(v bool) *ZonalShiftConfigRequest {
+	s.Enabled = &v
+	return s
+}
+
+// The status of zonal shift configuration for the cluster
+type ZonalShiftConfigResponse struct {
+	_ struct{} `type:"structure"`
+
+	// Whether the zonal shift is enabled.
+	Enabled *bool `locationName:"enabled" type:"boolean"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ZonalShiftConfigResponse) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ZonalShiftConfigResponse) GoString() string {
+	return s.String()
+}
+
+// SetEnabled sets the Enabled field's value.
+func (s *ZonalShiftConfigResponse) SetEnabled(v bool) *ZonalShiftConfigResponse {
+	s.Enabled = &v
+	return s
+}
+
 const (
 	// AMITypesAl2X8664 is a AMITypes enum value
 	AMITypesAl2X8664 = "AL2_x86_64"
@@ -19581,6 +20256,12 @@ const (
 
 	// AMITypesAl2023Arm64Standard is a AMITypes enum value
 	AMITypesAl2023Arm64Standard = "AL2023_ARM_64_STANDARD"
+
+	// AMITypesAl2023X8664Neuron is a AMITypes enum value
+	AMITypesAl2023X8664Neuron = "AL2023_x86_64_NEURON"
+
+	// AMITypesAl2023X8664Nvidia is a AMITypes enum value
+	AMITypesAl2023X8664Nvidia = "AL2023_x86_64_NVIDIA"
 )
 
 // AMITypes_Values returns all elements of the AMITypes enum
@@ -19600,6 +20281,8 @@ func AMITypes_Values() []string {
 		AMITypesWindowsFull2022X8664,
 		AMITypesAl2023X8664Standard,
 		AMITypesAl2023Arm64Standard,
+		AMITypesAl2023X8664Neuron,
+		AMITypesAl2023X8664Nvidia,
 	}
 }
 
@@ -20296,6 +20979,9 @@ const (
 
 	// NodegroupIssueCodeEc2launchTemplateVersionMaxLimitExceeded is a NodegroupIssueCode enum value
 	NodegroupIssueCodeEc2launchTemplateVersionMaxLimitExceeded = "Ec2LaunchTemplateVersionMaxLimitExceeded"
+
+	// NodegroupIssueCodeEc2instanceTypeDoesNotExist is a NodegroupIssueCode enum value
+	NodegroupIssueCodeEc2instanceTypeDoesNotExist = "Ec2InstanceTypeDoesNotExist"
 )
 
 // NodegroupIssueCode_Values returns all elements of the NodegroupIssueCode enum
@@ -20336,6 +21022,7 @@ func NodegroupIssueCode_Values() []string {
 		NodegroupIssueCodeAutoScalingGroupInstanceRefreshActive,
 		NodegroupIssueCodeKubernetesLabelInvalid,
 		NodegroupIssueCodeEc2launchTemplateVersionMaxLimitExceeded,
+		NodegroupIssueCodeEc2instanceTypeDoesNotExist,
 	}
 }
 
@@ -20518,6 +21205,18 @@ const (
 
 	// UpdateParamTypeUpgradePolicy is a UpdateParamType enum value
 	UpdateParamTypeUpgradePolicy = "UpgradePolicy"
+
+	// UpdateParamTypeZonalShiftConfig is a UpdateParamType enum value
+	UpdateParamTypeZonalShiftConfig = "ZonalShiftConfig"
+
+	// UpdateParamTypeComputeConfig is a UpdateParamType enum value
+	UpdateParamTypeComputeConfig = "ComputeConfig"
+
+	// UpdateParamTypeStorageConfig is a UpdateParamType enum value
+	UpdateParamTypeStorageConfig = "StorageConfig"
+
+	// UpdateParamTypeKubernetesNetworkConfig is a UpdateParamType enum value
+	UpdateParamTypeKubernetesNetworkConfig = "KubernetesNetworkConfig"
 )
 
 // UpdateParamType_Values returns all elements of the UpdateParamType enum
@@ -20552,6 +21251,10 @@ func UpdateParamType_Values() []string {
 		UpdateParamTypeAuthenticationMode,
 		UpdateParamTypePodIdentityAssociations,
 		UpdateParamTypeUpgradePolicy,
+		UpdateParamTypeZonalShiftConfig,
+		UpdateParamTypeComputeConfig,
+		UpdateParamTypeStorageConfig,
+		UpdateParamTypeKubernetesNetworkConfig,
 	}
 }
 
@@ -20612,6 +21315,12 @@ const (
 
 	// UpdateTypeUpgradePolicyUpdate is a UpdateType enum value
 	UpdateTypeUpgradePolicyUpdate = "UpgradePolicyUpdate"
+
+	// UpdateTypeZonalShiftConfigUpdate is a UpdateType enum value
+	UpdateTypeZonalShiftConfigUpdate = "ZonalShiftConfigUpdate"
+
+	// UpdateTypeAutoModeUpdate is a UpdateType enum value
+	UpdateTypeAutoModeUpdate = "AutoModeUpdate"
 )
 
 // UpdateType_Values returns all elements of the UpdateType enum
@@ -20628,5 +21337,7 @@ func UpdateType_Values() []string {
 		UpdateTypeVpcConfigUpdate,
 		UpdateTypeAccessConfigUpdate,
 		UpdateTypeUpgradePolicyUpdate,
+		UpdateTypeZonalShiftConfigUpdate,
+		UpdateTypeAutoModeUpdate,
 	}
 }

@@ -906,7 +906,9 @@
         "WINDOWS_CORE_2022_x86_64",
         "WINDOWS_FULL_2022_x86_64",
         "AL2023_x86_64_STANDARD",
-        "AL2023_ARM_64_STANDARD"
+        "AL2023_ARM_64_STANDARD",
+        "AL2023_x86_64_NEURON",
+        "AL2023_x86_64_NVIDIA"
       ]
     },
     "AccessConfigResponse":{
@@ -1076,6 +1078,7 @@
       "members":{
         "addonVersion":{"shape":"String"},
         "architecture":{"shape":"StringList"},
+        "computeTypes":{"shape":"StringList"},
         "compatibilities":{"shape":"Compatibilities"},
         "requiresConfiguration":{"shape":"Boolean"},
         "requiresIamPermissions":{"shape":"Boolean"}
@@ -1211,6 +1214,12 @@
       "error":{"httpStatusCode":400},
       "exception":true
     },
+    "BlockStorage":{
+      "type":"structure",
+      "members":{
+        "enabled":{"shape":"BoxedBoolean"}
+      }
+    },
     "Boolean":{"type":"boolean"},
     "BoxedBoolean":{
       "type":"boolean",
@@ -1295,7 +1304,11 @@
         "health":{"shape":"ClusterHealth"},
         "outpostConfig":{"shape":"OutpostConfigResponse"},
         "accessConfig":{"shape":"AccessConfigResponse"},
-        "upgradePolicy":{"shape":"UpgradePolicyResponse"}
+        "upgradePolicy":{"shape":"UpgradePolicyResponse"},
+        "zonalShiftConfig":{"shape":"ZonalShiftConfigResponse"},
+        "remoteNetworkConfig":{"shape":"RemoteNetworkConfigResponse"},
+        "computeConfig":{"shape":"ComputeConfigResponse"},
+        "storageConfig":{"shape":"StorageConfigResponse"}
       }
     },
     "ClusterHealth":{
@@ -1367,6 +1380,22 @@
         "clusterVersion":{"shape":"String"},
         "platformVersions":{"shape":"StringList"},
         "defaultVersion":{"shape":"Boolean"}
+      }
+    },
+    "ComputeConfigRequest":{
+      "type":"structure",
+      "members":{
+        "enabled":{"shape":"BoxedBoolean"},
+        "nodePools":{"shape":"StringList"},
+        "nodeRoleArn":{"shape":"String"}
+      }
+    },
+    "ComputeConfigResponse":{
+      "type":"structure",
+      "members":{
+        "enabled":{"shape":"BoxedBoolean"},
+        "nodePools":{"shape":"StringList"},
+        "nodeRoleArn":{"shape":"String"}
       }
     },
     "ConnectorConfigProvider":{
@@ -1506,7 +1535,11 @@
         "outpostConfig":{"shape":"OutpostConfigRequest"},
         "accessConfig":{"shape":"CreateAccessConfigRequest"},
         "bootstrapSelfManagedAddons":{"shape":"BoxedBoolean"},
-        "upgradePolicy":{"shape":"UpgradePolicyRequest"}
+        "upgradePolicy":{"shape":"UpgradePolicyRequest"},
+        "zonalShiftConfig":{"shape":"ZonalShiftConfigRequest"},
+        "remoteNetworkConfig":{"shape":"RemoteNetworkConfigRequest"},
+        "computeConfig":{"shape":"ComputeConfigRequest"},
+        "storageConfig":{"shape":"StorageConfigRequest"}
       }
     },
     "CreateClusterResponse":{
@@ -2269,6 +2302,12 @@
       "type":"string",
       "enum":["MONTHS"]
     },
+    "ElasticLoadBalancing":{
+      "type":"structure",
+      "members":{
+        "enabled":{"shape":"BoxedBoolean"}
+      }
+    },
     "EncryptionConfig":{
       "type":"structure",
       "members":{
@@ -2549,7 +2588,8 @@
       "type":"structure",
       "members":{
         "serviceIpv4Cidr":{"shape":"String"},
-        "ipFamily":{"shape":"IpFamily"}
+        "ipFamily":{"shape":"IpFamily"},
+        "elasticLoadBalancing":{"shape":"ElasticLoadBalancing"}
       }
     },
     "KubernetesNetworkConfigResponse":{
@@ -2557,7 +2597,8 @@
       "members":{
         "serviceIpv4Cidr":{"shape":"String"},
         "serviceIpv6Cidr":{"shape":"String"},
-        "ipFamily":{"shape":"IpFamily"}
+        "ipFamily":{"shape":"IpFamily"},
+        "elasticLoadBalancing":{"shape":"ElasticLoadBalancing"}
       }
     },
     "LaunchTemplateSpecification":{
@@ -3116,7 +3157,8 @@
         "Unknown",
         "AutoScalingGroupInstanceRefreshActive",
         "KubernetesLabelInvalid",
-        "Ec2LaunchTemplateVersionMaxLimitExceeded"
+        "Ec2LaunchTemplateVersionMaxLimitExceeded",
+        "Ec2InstanceTypeDoesNotExist"
       ]
     },
     "NodegroupResources":{
@@ -3302,6 +3344,42 @@
         "sourceSecurityGroups":{"shape":"StringList"}
       }
     },
+    "RemoteNetworkConfigRequest":{
+      "type":"structure",
+      "members":{
+        "remoteNodeNetworks":{"shape":"RemoteNodeNetworkList"},
+        "remotePodNetworks":{"shape":"RemotePodNetworkList"}
+      }
+    },
+    "RemoteNetworkConfigResponse":{
+      "type":"structure",
+      "members":{
+        "remoteNodeNetworks":{"shape":"RemoteNodeNetworkList"},
+        "remotePodNetworks":{"shape":"RemotePodNetworkList"}
+      }
+    },
+    "RemoteNodeNetwork":{
+      "type":"structure",
+      "members":{
+        "cidrs":{"shape":"StringList"}
+      }
+    },
+    "RemoteNodeNetworkList":{
+      "type":"list",
+      "member":{"shape":"RemoteNodeNetwork"},
+      "max":1
+    },
+    "RemotePodNetwork":{
+      "type":"structure",
+      "members":{
+        "cidrs":{"shape":"StringList"}
+      }
+    },
+    "RemotePodNetworkList":{
+      "type":"list",
+      "member":{"shape":"RemotePodNetwork"},
+      "max":1
+    },
     "ResolveConflicts":{
       "type":"string",
       "enum":[
@@ -3379,6 +3457,18 @@
       "error":{"httpStatusCode":503},
       "exception":true,
       "fault":true
+    },
+    "StorageConfigRequest":{
+      "type":"structure",
+      "members":{
+        "blockStorage":{"shape":"BlockStorage"}
+      }
+    },
+    "StorageConfigResponse":{
+      "type":"structure",
+      "members":{
+        "blockStorage":{"shape":"BlockStorage"}
+      }
     },
     "String":{"type":"string"},
     "StringList":{
@@ -3584,7 +3674,11 @@
           "idempotencyToken":true
         },
         "accessConfig":{"shape":"UpdateAccessConfigRequest"},
-        "upgradePolicy":{"shape":"UpgradePolicyRequest"}
+        "upgradePolicy":{"shape":"UpgradePolicyRequest"},
+        "zonalShiftConfig":{"shape":"ZonalShiftConfigRequest"},
+        "computeConfig":{"shape":"ComputeConfigRequest"},
+        "kubernetesNetworkConfig":{"shape":"KubernetesNetworkConfigRequest"},
+        "storageConfig":{"shape":"StorageConfigRequest"}
       }
     },
     "UpdateClusterConfigResponse":{
@@ -3754,7 +3848,11 @@
         "Subnets",
         "AuthenticationMode",
         "PodIdentityAssociations",
-        "UpgradePolicy"
+        "UpgradePolicy",
+        "ZonalShiftConfig",
+        "ComputeConfig",
+        "StorageConfig",
+        "KubernetesNetworkConfig"
       ]
     },
     "UpdateParams":{
@@ -3820,7 +3918,9 @@
         "AddonUpdate",
         "VpcConfigUpdate",
         "AccessConfigUpdate",
-        "UpgradePolicyUpdate"
+        "UpgradePolicyUpdate",
+        "ZonalShiftConfigUpdate",
+        "AutoModeUpdate"
       ]
     },
     "UpgradePolicyRequest":{
@@ -3861,6 +3961,18 @@
       "type":"integer",
       "box":true,
       "min":0
+    },
+    "ZonalShiftConfigRequest":{
+      "type":"structure",
+      "members":{
+        "enabled":{"shape":"BoxedBoolean"}
+      }
+    },
+    "ZonalShiftConfigResponse":{
+      "type":"structure",
+      "members":{
+        "enabled":{"shape":"BoxedBoolean"}
+      }
     },
     "configStatus":{
       "type":"string",
